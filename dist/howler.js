@@ -563,6 +563,19 @@
       self._src = (typeof o.src !== 'string') ? o.src : [o.src];
       self._volume = o.volume !== undefined ? o.volume : 1;
       self._xhrWithCredentials = o.xhrWithCredentials || false;
+      self._xhrHeaders = [];
+
+      if (o.headers && Array.isArray(o.headers)) {
+        
+        for (var i=0; i<o.headers.length; i++) {
+          if (o.headers[i].name && o.headers[i].value) {
+            self._xhrHeaders.push({
+              name: o.headers[i].name,
+              value: o.headers[i].value
+            });
+          }
+        }
+      }
 
       // Setup all other default properties.
       self._duration = 0;
@@ -2202,7 +2215,7 @@
         self._node.gain.setValueAtTime(volume, Howler.ctx.currentTime);
         self._node.paused = true;
         self._node.connect(Howler.masterGain);
-      } else {
+      } else if (!Howler.noAudio) {
         // Get an unlocked Audio object from the pool.
         self._node = Howler._obtainHtml5Audio();
 
@@ -2328,6 +2341,13 @@
       xhr.open('GET', url, true);
       xhr.withCredentials = self._xhrWithCredentials;
       xhr.responseType = 'arraybuffer';
+
+      if (self._xhrHeaders.length > 0) {
+        for (var i=0; i<self._xhrHeaders.length; i++) {
+          xhr.setRequestHeader(self._xhrHeaders[i].name, self._xhrHeaders[i].value);
+        };
+      }
+
       xhr.onload = function() {
         // Make sure we get a successful response back.
         var code = (xhr.status + '')[0];

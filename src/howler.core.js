@@ -566,13 +566,15 @@
       self._xhrHeaders = [];
 
       if (o.headers && Array.isArray(o.headers)) {
-        o.headers.forEach(h => {
-          if (h.name && h.value)
+        
+        for (var i=0; i<o.headers.length; i++) {
+          if (o.headers[i].name && o.headers[i].value) {
             self._xhrHeaders.push({
-              name: h.name,
-              value: h.value
+              name: o.headers[i].name,
+              value: o.headers[i].value
             });
-        });
+          }
+        }
       }
 
       // Setup all other default properties.
@@ -2341,9 +2343,9 @@
       xhr.responseType = 'arraybuffer';
 
       if (self._xhrHeaders.length > 0) {
-        self._xhrHeaders.forEach(header => {
-          xhr.setRequestHeader(header.name, header.value);
-        });
+        for (var i=0; i<self._xhrHeaders.length; i++) {
+          xhr.setRequestHeader(self._xhrHeaders[i].name, self._xhrHeaders[i].value);
+        };
       }
 
       xhr.onload = function() {
